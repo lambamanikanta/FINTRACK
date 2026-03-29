@@ -1,0 +1,57 @@
+# Expense tracker — MongoDB Atlas + Node API + React (Vite) behind nginx
+#
+# 1. copy .env.example .env   → set Atlas (MONGODB_URI or ATLAS_*) + JWT_SECRET
+# 2. docker compose up --build -d
+# 3. Open http://localhost — SPA on :80; /api, /health, /uploads proxy to api:5000
+#
+# Atlas: Network Access → allow your IP (or 0.0.0.0/0 for testing).
+
+name: fintrack
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fintrack-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: "5000"
+      HOST: "0.0.0.0"
+      MONGODB_URI: ${MONGODB_URI:-}
+      ATLAS_CLUSTER_HOST: ${ATLAS_CLUSTER_HOST:-}
+      ATLAS_DB_USER: ${ATLAS_DB_USER:-}
+      ATLAS_DB_PASSWORD: ${ATLAS_DB_PASSWORD:-}
+      ATLAS_DB_NAME: ${ATLAS_DB_NAME:-fintrack}
+      JWT_SECRET: ${JWT_SECRET:-change-me-set-JWT_SECRET-in-root-env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+    volumes:
+      - fintrack_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Empty = same-origin /api (nginx proxies to api). Set for split deploy, e.g. https://api.example.com
+        VITE_API_URL: ${VITE_API_URL:-}
+    container_name: fintrack-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  fintrack_uploads:
