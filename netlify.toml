@@ -1,0 +1,11 @@
+# Root Netlify config — ensures production build (not `npm run dev`).
+# Base directory = frontend; publish path is relative to repo root.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "frontend/dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

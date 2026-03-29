@@ -1,0 +1,34 @@
+# Render Blueprint — backend API only (https://render.com/docs/blueprint-spec)
+# Connect this repo in Render → New → Blueprint, or paste this file.
+# Set secret env vars in the Render dashboard when prompted (sync: false).
+
+services:
+  - type: web
+    name: fintrack-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      # Secrets — set values in Render dashboard (Blueprint will prompt)
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      # Use either full URI or Atlas host + user/pass (see backend/.env.example)
+      - key: MONGODB_URI
+        sync: false
+      - key: ATLAS_CLUSTER_HOST
+        sync: false
+      - key: ATLAS_DB_USER
+        sync: false
+      - key: ATLAS_DB_PASSWORD
+        sync: false
+      - key: ATLAS_DB_NAME
+        value: fintrack

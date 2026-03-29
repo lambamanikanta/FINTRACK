@@ -1,0 +1,10 @@
+# Netlify — set "Base directory" to `frontend` if the repo root is the monorepo root
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# React Router: avoid "Page not found" on /dashboard, /login, etc.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
