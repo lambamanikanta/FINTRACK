@@ -56,7 +56,7 @@ export default function TransactionForm({ onCreated }) {
             required
             value={form.title}
             onChange={(e) => update('title', e.target.value)}
-            placeholder="e.g. Groceries"
+            placeholder="e.g. Amazon"
           />
         </label>
         <label className="field">
